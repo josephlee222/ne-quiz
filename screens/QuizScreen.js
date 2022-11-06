@@ -36,7 +36,14 @@ function QuizScreen({navigation}) {
     var currentQuestion = 0
     var maxQuestion = questions.length
 
+    useEffect(() => {
+        // Shuffle the questions array
+        questions = shuffleQuestions(questions)
+        console.log(JSON.stringify(questions))
+        getQuestion()
+    }, [])
 
+    // Array shuffle function
     function shuffleQuestions(array) {
         let currentIndex = array.length, randomIndex;
       
@@ -77,20 +84,13 @@ function QuizScreen({navigation}) {
 
         if ((currentQuestion + 1) == maxQuestion) {
             // Finish quiz here
+            navigation.navigate("Result")
         } else {
             // Continue with the next question
             currentQuestion++
             getQuestion()
         }
     }
-
-    useEffect(() => {
-        // Shuffle the questions array
-        questions = shuffleQuestions(questions)
-        console.log(JSON.stringify(questions))
-        getQuestion()
-    }, [])
-
 
     return (
         <>

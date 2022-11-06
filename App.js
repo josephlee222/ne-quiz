@@ -5,6 +5,7 @@ import StartScreen from './screens/StartScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import QuizScreen from './screens/QuizScreen';
+import ResultScreen from './screens/ResultScreen';
 
 
 const theme = {
@@ -30,6 +31,7 @@ export default function App() {
           }}>
             <Stack.Screen name='Start' component={StartScreen}></Stack.Screen>
             <Stack.Screen name='Quiz' component={QuizScreen}></Stack.Screen>
+            <Stack.Screen name='Result' component={ResultScreen}></Stack.Screen>
           </Stack.Navigator>
       </PaperProvider>
     </NavigationContainer>
