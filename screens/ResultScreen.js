@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { Button, TextInput, Appbar, Card, Paragraph, Title, ProgressBar, Text, MD2Colors } from 'react-native-paper';
 
 function ResultScreen({navigation}) {
+
     return (
         <>
             <Appbar.Header>
@@ -10,7 +11,7 @@ function ResultScreen({navigation}) {
                 <Appbar.Content title="Quiz" />
             </Appbar.Header>
             <View style={styles.container}>
-                
+                <Text>Quiz Finish.</Text>
             </View>
         </>
     )

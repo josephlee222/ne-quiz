@@ -6,16 +6,7 @@ import { Button, TextInput, Appbar, Card, Paragraph, Title, ProgressBar, Text, M
 function QuizScreen({navigation}) {
 
     // Component state
-    const [questionNumberText, setQuestionNumberText] = useState("Question 0/0")
-    const [questionNumber, setQuestionNumber] = useState(0)
-    const [questionText, setQuestionText] = useState("Placeholder question.")
-    const [questionImage, setQuestionImage] = useState(require("../imgs/cabinet.jpg"))
-    const [scoreValue, setScoreValue] = useState(0)
-    const [submitButtonText, setSubmitButtonText] = useState("Placeholder submit button")
-    const [answerText, setAnswerText] = useState("bruh")
-
-
-    var questions = [
+    const [questions, setQuestions] = useState([
         {
             "question": "Who was the first prime minister of Singapore?",
             "answer": "Lee Kuan Yew",
@@ -31,17 +22,16 @@ function QuizScreen({navigation}) {
             "answer": "Yusof Ishak",
             "image": require("../imgs/Yusof_Ishak.jpg")
         },
-    ]
-    var correctQuestion = 0
-    var currentQuestion = 0
-    var maxQuestion = questions.length
-
-    useEffect(() => {
-        // Shuffle the questions array
-        questions = shuffleQuestions(questions)
-        console.log(JSON.stringify(questions))
-        getQuestion()
-    }, [])
+    ])
+    const [questionNumberText, setQuestionNumberText] = useState("Question 0/0")
+    const [questionNumber, setQuestionNumber] = useState(0)
+    const [questionText, setQuestionText] = useState("Placeholder question.")
+    const [questionImage, setQuestionImage] = useState(require("../imgs/cabinet.jpg"))
+    const [scoreValue, setScoreValue] = useState(0)
+    const [submitButtonText, setSubmitButtonText] = useState("Placeholder submit button")
+    const [answerText, setAnswerText] = useState("bruh")
+    const [correctQuestion, setCorrectQuestion] = useState(0)
+    const [maxQuestion, setMaxQuestion] = useState(questions.length)
 
     // Array shuffle function
     function shuffleQuestions(array) {
@@ -64,11 +54,11 @@ function QuizScreen({navigation}) {
 
     function getQuestion() {
         // Get question to display
-        setQuestionText(questions[currentQuestion].question)
-        setQuestionNumberText("Question " + (currentQuestion + 1) + "/" + maxQuestion)
-        setQuestionNumber(currentQuestion + 1)
-        setQuestionImage(questions[currentQuestion].image)
-        if ((currentQuestion + 1) == maxQuestion) {
+        console.log(questionNumber)
+        setQuestionText(questions[questionNumber].question)
+        setQuestionNumberText("Question " + (questionNumber + 1) + "/" + maxQuestion)
+        setQuestionImage(questions[questionNumber].image)
+        if ((questionNumber + 1) == maxQuestion) {
             setSubmitButtonText("Finish Quiz")
         } else {
             setSubmitButtonText("Next Question")
@@ -77,20 +67,32 @@ function QuizScreen({navigation}) {
 
     function checkQuestion() {
         // Check whether question is correct or not
-        if (questions[currentQuestion].answer == answerText) {
-            correctQuestion++
-            setScoreValue(correctQuestion / maxQuestion)
+        if (questions[questionNumber].answer == answerText) {
+            setCorrectQuestion(correctQuestion + 1)
         }
 
-        if ((currentQuestion + 1) == maxQuestion) {
+        if ((questionNumber + 1) == maxQuestion) {
             // Finish quiz here
-            navigation.navigate("Result")
+            navigation.navigate("Result", {score: scoreValue})
         } else {
             // Continue with the next question
-            currentQuestion++
-            getQuestion()
+            setQuestionNumber(questionNumber + 1)
         }
     }
+
+    useEffect(() => {
+        // Shuffle the questions array
+        setQuestions(shuffleQuestions(questions))
+        getQuestion()
+        console.log(JSON.stringify(questions))
+        console.log(maxQuestion)
+    }, [])
+
+    useEffect(() => {
+        setScoreValue(correctQuestion / maxQuestion)
+        console.log("Correct answer: " + scoreValue)
+        getQuestion()
+    }, [questionNumber])
 
     return (
         <>
@@ -110,7 +112,7 @@ function QuizScreen({navigation}) {
                 </Card>
                 <Card>
                     <Card.Cover source={questionImage} />
-                    <Card.Title title={"Question " + questionNumber} subtitle={questionText}/>
+                    <Card.Title title={"Question " + (questionNumber + 1)} subtitle={questionText}/>
                     <Card.Content>
                         <TextInput onChangeText={newText => setAnswerText(newText)} placeholder='Write your answer...'></TextInput>
                     </Card.Content>
