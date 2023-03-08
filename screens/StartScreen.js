@@ -1,27 +1,43 @@
-import { StyleSheet, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { StyleSheet, View, ScrollView } from 'react-native';
 import { Button, TextInput, Appbar, Card, Paragraph } from 'react-native-paper';
 
 
-function StartScreen({navigation}) {
+function StartScreen({ navigation }) {
+
+    const [data, setData] = useState([])
+
+    const getQuizzes = async () => {
+        const response = await fetch('https://facebooklee53.pythonanywhere.com/quiz')
+        const json = await response.json()
+        setData(json)
+    }
+    
+    useEffect(() => {getQuizzes()}, [])
+
+    console.log(data)
+    
     return (
         <>
             <Appbar.Header>
-                <Appbar.Content title="NE Quiz App" />
+                <Appbar.Content title="Quiz App" />
             </Appbar.Header>
-            <View style={styles.container}>
-                <Card>
-                    <Card.Cover source={require('../imgs/cabinet.jpg')} />
-                    <Card.Title title="NE Quiz!" subtitle="Welcome to the quiz!"/>
-                    <Card.Content>
-                        <Paragraph>This quiz tests your knowledge on Singapore history and common knowledge. Touch the button to start!</Paragraph>
-                    </Card.Content>
-                    <Card.Actions>
-                        <Button onPress={() => navigation.navigate("Quiz")}>
-                            Start!
-                        </Button>
-                    </Card.Actions>
-                </Card>
-            </View>
+            <ScrollView style={styles.container}>
+                {data.map((item) => (
+                    <Card style={{marginBottom: 8}}>
+                        <Card.Cover source={{ uri: item["image_url"]}} />
+                        <Card.Title title={item["title"]} subtitle="Quiz!" />
+                        <Card.Content>
+                            <Paragraph>{item["description"]}</Paragraph>
+                        </Card.Content>
+                        <Card.Actions>
+                            <Button onPress={() => navigation.navigate("Quiz", {id: item["id"]})}>
+                                Start!
+                            </Button>
+                        </Card.Actions>
+                    </Card>
+                ))}
+            </ScrollView>
         </>
     )
 }

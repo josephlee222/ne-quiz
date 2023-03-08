@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { Button, TextInput, Appbar, Card, Paragraph, Title, ProgressBar, Text, MD2Colors } from 'react-native-paper';
 
 
-function QuizScreen({navigation}) {
+function QuizScreen({route, navigation}) {
 
     // Component state
     const [questions, setQuestions] = useState([
@@ -32,6 +32,18 @@ function QuizScreen({navigation}) {
     const [answerText, setAnswerText] = useState("bruh")
     const [correctQuestion, setCorrectQuestion] = useState(0)
     const [maxQuestion, setMaxQuestion] = useState(questions.length)
+
+    // Get parameters such as quiz ID to query
+    const {id} = route.params;
+
+    // Getting question data
+    const getQuestions = async () => {
+        const response = await fetch('https://facebooklee53.pythonanywhere.com/quiz/' + id)
+        const json = await response.json()
+        console.log(json["questions"])
+        setMaxQuestion(json["questions"].length)
+        setQuestions(json["questions"])
+    }
 
     // Array shuffle function
     function shuffleQuestions(array) {
@@ -66,14 +78,18 @@ function QuizScreen({navigation}) {
     }
 
     function checkQuestion() {
+        var tempScore = 0
         // Check whether question is correct or not
         if (questions[questionNumber].answer == answerText) {
             setCorrectQuestion(correctQuestion + 1)
+            tempScore = (correctQuestion + 1) / maxQuestion
+        } else {
+            tempScore = (correctQuestion) / maxQuestion
         }
 
         if ((questionNumber + 1) == maxQuestion) {
             // Finish quiz here
-            navigation.navigate("Result", {score: scoreValue})
+            navigation.navigate("Result", {score: tempScore})
         } else {
             // Continue with the next question
             setQuestionNumber(questionNumber + 1)
@@ -81,18 +97,27 @@ function QuizScreen({navigation}) {
     }
 
     useEffect(() => {
+        getQuestions()
+    }, [])
+
+    useEffect(() => {
         // Shuffle the questions array
         setQuestions(shuffleQuestions(questions))
         getQuestion()
         console.log(JSON.stringify(questions))
         console.log(maxQuestion)
-    }, [])
+    }, [questions])
 
     useEffect(() => {
-        setScoreValue(correctQuestion / maxQuestion)
         console.log("Correct answer: " + scoreValue)
         getQuestion()
     }, [questionNumber])
+
+    useEffect(() => {
+        setScoreValue(correctQuestion / maxQuestion)
+    }, [correctQuestion])
+
+    
 
     return (
         <>
@@ -111,8 +136,8 @@ function QuizScreen({navigation}) {
                     </Card.Content>
                 </Card>
                 <Card>
-                    <Card.Cover source={questionImage} />
-                    <Card.Title title={"Question " + (questionNumber + 1)} subtitle={questionText}/>
+                    <Card.Cover source={{uri: "https://picsum.photos/640/480"}} />
+                    <Card.Title subtitleNumberOfLines={3} title={"Question " + (questionNumber + 1)} subtitle={questionText}/>
                     <Card.Content>
                         <TextInput onChangeText={newText => setAnswerText(newText)} placeholder='Write your answer...'></TextInput>
                     </Card.Content>
